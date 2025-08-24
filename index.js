@@ -23,7 +23,6 @@ app.get("/", (req, res) => {
   res.render("index", { url: null });
 });
 
-// multer ek middleware hai jo local server pe file upload handle karta hai.
 const storage = multer.diskStorage({
   destination: "./public/uploads",
   filename: function (req, file, cb) {
