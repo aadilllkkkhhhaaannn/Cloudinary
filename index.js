@@ -6,6 +6,7 @@ const path = require("path");
 const connectDB = require("./DB/db_config");
 const PORT = process.env.PORT || 5000;
 const { v2: cloudinary } = require("cloudinary");
+const Cloudinary = require("./model/File");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -19,9 +20,10 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { url: null });
 });
 
+// multer ek middleware hai jo local server pe file upload handle karta hai.
 const storage = multer.diskStorage({
   destination: "./public/uploads",
   filename: function (req, file, cb) {
@@ -36,14 +38,29 @@ const upload = multer({ storage: storage });
 
 app.post("/upload", upload.single("file"), async (req, res) => {
   try {
-    const file = req.file.path;
+    const ext = path.extname(req.file.originalname).slice(1);
+    const filePath = req.file.path;
 
-    const cloudinaryResponse = await cloudinary.uploader.upload(file, {
+    const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
       folder: "Image_Uploads",
     });
+    const cloudinaryFile = new Cloudinary({
+      originalName: req.file.originalname,
+      cloudinaryUrl: cloudinaryResponse.secure_url,
+      format: cloudinaryResponse.format,
+      resource_type: cloudinaryResponse.resource_type,
+      asset_folder: Image_Uploads,
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.API_KEY,
+      api_secret: process.env.API_SECRET,
+      original_extension: path.extname(req.file.originalname).slice(1),
+      public_id: cloudinaryResponse.public_id,
+    });
 
-    console.log("response", cloudinaryResponse);
-    res.json({ success: true, data: cloudinaryResponse });
+    await cloudinaryFile.save();
+
+    // Render the uploaded URL
+    res.render("index", { url: cloudinaryResponse.secure_url });
   } catch (error) {
     console.log("Upload Error", error);
     res.status(500).json({ success: false, message: error.message });

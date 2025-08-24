@@ -24,6 +24,12 @@
       <input type="file" name="file" />
       <input type="submit" value="Upload" />
     </form>
-    <div class="container"></div>
+  <div class="container">
+  <% if (url) { %>
+    <h1>File uploaded successfully</h1>
+    <img src="<%= url %>" alt="" style="height: 100px; width: 100px;">
+  <% } %>
+</div>
+
   </body>
 </html>
