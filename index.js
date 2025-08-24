@@ -44,14 +44,14 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       folder: "Image_Uploads",
     });
     const cloudinaryFile = new Cloudinary({
-      originalName: req.file.originalname,
-      cloudinaryUrl: cloudinaryResponse.secure_url,
-      format: cloudinaryResponse.format,
-      resource_type: cloudinaryResponse.resource_type,
-      asset_folder: Image_Uploads,
-      cloud_name: process.env.CLOUD_NAME,
-      api_key: process.env.API_KEY,
-      api_secret: process.env.API_SECRET,
+      originalName: req?.file?.originalname,
+      cloudinaryUrl: cloudinaryResponse?.secure_url,
+      format: cloudinaryResponse?.format,
+      resource_type: cloudinaryResponse?.resource_type,
+      asset_folder: "Image_Uploads",
+      cloud_name: process?.env?.CLOUD_NAME,
+      api_key: process?.env?.API_KEY,
+      api_secret: process?.env?.API_SECRET,
       original_extension: path.extname(req.file.originalname).slice(1),
       public_id: cloudinaryResponse.public_id,
     });
